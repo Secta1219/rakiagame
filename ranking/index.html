@@ -377,6 +377,52 @@
         const auth = getAuth(app);
         const authArea = document.getElementById('authArea');
 
+        // 認証キャッシュ
+        const AUTH_CACHE_KEY = 'authCache';
+        function getAuthCache() {
+            try {
+                const cached = sessionStorage.getItem(AUTH_CACHE_KEY);
+                return cached ? JSON.parse(cached) : null;
+            } catch { return null; }
+        }
+
+        function showUserUI(name, avatarId) {
+            authArea.innerHTML = `
+                <div class="user-dropdown">
+                    <button class="user-dropdown-btn" id="userDropdownBtn">
+                        <img src="../images/avatars/${avatarId}.svg" class="user-avatar">
+                        <span class="user-name">${name}</span>
+                    </button>
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <a href="../profile/">プロフィール</a>
+                        <div class="divider"></div>
+                        <button id="logoutBtn">ログアウト</button>
+                    </div>
+                </div>`;
+            document.getElementById('userDropdownBtn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('userDropdownMenu').classList.toggle('show');
+            });
+            document.addEventListener('click', () => document.getElementById('userDropdownMenu').classList.remove('show'));
+            document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+            authArea.classList.add('ready');
+        }
+
+        function showLoginUI() {
+            authArea.innerHTML = '<a href="../" class="login-btn">ログイン</a>';
+            authArea.classList.add('ready');
+        }
+
+        // キャッシュから即時表示
+        const cachedAuth = getAuthCache();
+        if (cachedAuth) {
+            if (cachedAuth.loggedIn) {
+                showUserUI(cachedAuth.displayName, cachedAuth.avatarId || 'cat-orange');
+            } else {
+                showLoginUI();
+            }
+        }
+
         // 認証UI
         async function getUserProfile(uid) {
             try {
@@ -390,28 +436,10 @@
                 const profile = await getUserProfile(user.uid);
                 const name = profile?.displayName || 'ユーザー';
                 const avatarId = profile?.avatarId || 'cat-orange';
-                authArea.innerHTML = `
-                    <div class="user-dropdown">
-                        <button class="user-dropdown-btn" id="userDropdownBtn">
-                            <img src="../images/avatars/${avatarId}.svg" class="user-avatar">
-                            <span class="user-name">${name}</span>
-                        </button>
-                        <div class="user-dropdown-menu" id="userDropdownMenu">
-                            <a href="../profile/">プロフィール</a>
-                            <div class="divider"></div>
-                            <button id="logoutBtn">ログアウト</button>
-                        </div>
-                    </div>`;
-                document.getElementById('userDropdownBtn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    document.getElementById('userDropdownMenu').classList.toggle('show');
-                });
-                document.addEventListener('click', () => document.getElementById('userDropdownMenu').classList.remove('show'));
-                document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+                showUserUI(name, avatarId);
             } else {
-                authArea.innerHTML = '<a href="../" class="login-btn">ログイン</a>';
+                showLoginUI();
             }
-            authArea.classList.add('ready');
         });
 
         const RANKING_CACHE_DURATION = 15 * 60 * 1000; // 15分

@@ -761,8 +761,26 @@
             usernameError.textContent = '';
         }
 
+        // 認証キャッシュ
+        const AUTH_CACHE_KEY = 'authCache';
+
+        function saveAuthCache(data) {
+            sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(data));
+        }
+
+        function getAuthCache() {
+            try {
+                const cached = sessionStorage.getItem(AUTH_CACHE_KEY);
+                return cached ? JSON.parse(cached) : null;
+            } catch { return null; }
+        }
+
+        function clearAuthCache() {
+            sessionStorage.removeItem(AUTH_CACHE_KEY);
+        }
+
         // ヘッダー表示更新
-        function updateAuthUI(displayName, avatarId) {
+        function updateAuthUI(displayName, avatarId, skipCache = false) {
             const avatarSrc = avatarId ? `./images/avatars/${avatarId}.svg` : './images/avatars/cat-orange.svg';
             authArea.innerHTML = `
                 <div class="user-dropdown">
@@ -791,6 +809,31 @@
             });
 
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+            // キャッシュ保存
+            if (!skipCache) {
+                saveAuthCache({ loggedIn: true, displayName, avatarId });
+            }
+            authArea.classList.add('ready');
+        }
+
+        function showLoginButton(skipCache = false) {
+            authArea.innerHTML = `<button class="login-btn" id="loginBtn">ログイン</button>`;
+            document.getElementById('loginBtn').addEventListener('click', openModal);
+            if (!skipCache) {
+                saveAuthCache({ loggedIn: false });
+            }
+            authArea.classList.add('ready');
+        }
+
+        // キャッシュから即時表示
+        const cachedAuth = getAuthCache();
+        if (cachedAuth) {
+            if (cachedAuth.loggedIn) {
+                updateAuthUI(cachedAuth.displayName, cachedAuth.avatarId, true);
+            } else {
+                showLoginButton(true);
+            }
         }
 
         // ログイン状態の監視
@@ -811,10 +854,9 @@
                 }
             } else {
                 currentUserRef = null;
-                authArea.innerHTML = `<button class="login-btn" id="loginBtn">ログイン</button>`;
-                document.getElementById('loginBtn').addEventListener('click', openModal);
+                clearAuthCache();
+                showLoginButton();
             }
-            authArea.classList.add('ready');
         });
 
         // ユーザーネーム保存ボタン
