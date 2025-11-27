@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランキング | Rakia Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0d0d0d;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #252525;
+            --accent: #ff6b35;
+            --accent-dim: rgba(255, 107, 53, 0.15);
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --border: #2a2a2a;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ヘッダー */
+        header {
+            background: var(--bg-dark);
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 60px;
+            gap: 50px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.9rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        nav a:hover, nav a.active {
+            color: #fff;
+            background: var(--bg-card);
+        }
+
+        /* メインコンテンツ */
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* ゲーム別ランキング */
+        .game-ranking {
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .game-ranking-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .game-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .game-info h2 {
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .game-info p {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .play-link {
+            margin-left: auto;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .play-link:hover {
+            background: var(--accent-dim);
+        }
+
+        /* ランキングリスト */
+        .ranking-list {
+            list-style: none;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .ranking-item:nth-child(1) {
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .ranking-item:nth-child(2) {
+            background: rgba(192, 192, 192, 0.08);
+        }
+
+        .ranking-item:nth-child(3) {
+            background: rgba(205, 127, 50, 0.08);
+        }
+
+        .ranking-rank {
+            font-size: 1.1rem;
+            font-weight: bold;
+            width: 40px;
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        .ranking-item:nth-child(1) .ranking-rank { color: #fcd34d; }
+        .ranking-item:nth-child(2) .ranking-rank { color: #d1d5db; }
+        .ranking-item:nth-child(3) .ranking-rank { color: #d97706; }
+
+        .ranking-name {
+            flex: 1;
+            margin-left: 16px;
+            font-size: 0.95rem;
+        }
+
+        .ranking-score {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .ranking-loading, .ranking-empty {
+            color: var(--text-dim);
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .cache-info {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            margin-top: 16px;
+        }
+
+        /* フッター */
+        footer {
+            background: var(--bg-card);
+            padding: 24px 40px;
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 20px;
+            }
+
+            .header-content {
+                gap: 20px;
+            }
+
+            nav a {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            main {
+                padding: 24px 16px;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .game-ranking-header {
+                flex-wrap: wrap;
+            }
+
+            .play-link {
+                margin-left: 0;
+                margin-top: 12px;
+                width: 100%;
+                text-align: center;
+            }
+
+            footer {
+                padding: 20px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="../" class="logo">
+                <span class="logo-icon">R</span>
+                Rakia Games
+            </a>
+            <nav>
+                <a href="../">ゲーム</a>
+                <a href="./" class="active">ランキング</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1 class="page-title">ランキング</h1>
+            <p class="page-subtitle">各ゲームのトップスコア</p>
+        </div>
+
+        <div class="game-ranking">
+            <div class="game-ranking-header">
+                <img src="../images/click-challenge.png" alt="10秒クリックチャレンジ" class="game-icon">
+                <div class="game-info">
+                    <h2>10秒クリックチャレンジ</h2>
+                    <p>10秒間で何回クリックできる？</p>
+                </div>
+                <a href="../click-challenge/" class="play-link">プレイする</a>
+            </div>
+            <ul class="ranking-list" id="clickChallengeRanking">
+                <li class="ranking-loading">読み込み中...</li>
+            </ul>
+        </div>
+
+        <p class="cache-info" id="cacheInfo"></p>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Rakia Games</p>
+            <p>Made with fun</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvw5QmcshEf7sdy6YGgVK0Tkd_QaYmEoc",
+            authDomain: "fir-clicks-b5462.firebaseapp.com",
+            projectId: "fir-clicks-b5462",
+            storageBucket: "fir-clicks-b5462.firebasestorage.app",
+            messagingSenderId: "487554205426",
+            appId: "1:487554205426:web:b454471e0464f654c2326b",
+            measurementId: "G-V6CZDKSNYQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const RANKING_CACHE_DURATION = 15 * 60 * 1000; // 15分
+
+        const rankingList = document.getElementById('clickChallengeRanking');
+        const cacheInfo = document.getElementById('cacheInfo');
+
+        function getRankingCache() {
+            try {
+                const cached = localStorage.getItem('rankingCache');
+                if (!cached) return null;
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp > RANKING_CACHE_DURATION) {
+                    return null;
+                }
+                return { data, timestamp };
+            } catch {
+                return null;
+            }
+        }
+
+        function setRankingCache(data) {
+            localStorage.setItem('rankingCache', JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getNextUpdateTime(timestamp) {
+            const next = new Date(timestamp + RANKING_CACHE_DURATION);
+            return next.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function loadRanking() {
+            const cached = getRankingCache();
+            if (cached) {
+                console.log('ランキング: キャッシュから取得');
+                cacheInfo.textContent = `最終更新: ${formatTime(cached.timestamp)} / 次回更新: ${getNextUpdateTime(cached.timestamp)}`;
+                return cached.data;
+            }
+
+            try {
+                console.log('ランキング: Firebaseから取得');
+                const q = query(
+                    collection(db, 'rankings'),
+                    orderBy('score', 'desc'),
+                    limit(10)
+                );
+                const snapshot = await getDocs(q);
+                const rankings = [];
+                snapshot.forEach(doc => {
+                    rankings.push(doc.data());
+                });
+                setRankingCache(rankings);
+                cacheInfo.textContent = `最終更新: ${formatTime(Date.now())} / 次回更新: ${getNextUpdateTime(Date.now())}`;
+                return rankings;
+            } catch (error) {
+                console.error('ランキング取得エラー:', error);
+                return null;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderRanking(rankings) {
+            if (rankings === null) {
+                rankingList.innerHTML = '<li class="ranking-empty">取得に失敗しました</li>';
+                return;
+            }
+            if (rankings.length === 0) {
+                rankingList.innerHTML = '<li class="ranking-empty">まだ記録がありません</li>';
+                return;
+            }
+
+            rankingList.innerHTML = rankings.map((r, i) => `
+                <li class="ranking-item">
+                    <span class="ranking-rank">${i + 1}</span>
+                    <span class="ranking-name">${escapeHtml(r.name)}</span>
+                    <span class="ranking-score">${r.score} 回</span>
+                </li>
+            `).join('');
+        }
+
+        async function init() {
+            const rankings = await loadRanking();
+            renderRanking(rankings);
+        }
+
+        init();
+    </script>
+</body>
+</html>
