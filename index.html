@@ -611,7 +611,7 @@
         });
 
         // 登録/ログイン切り替え
-        toggleLink.addEventListener('click', () => {
+        function handleToggle() {
             isSignUp = !isSignUp;
             if (isSignUp) {
                 modalTitle.textContent = '新規登録';
@@ -622,9 +622,10 @@
                 emailSubmitBtn.textContent = 'ログイン';
                 authToggle.innerHTML = 'アカウントをお持ちでない方は <a id="toggleLink">新規登録</a>';
             }
-            document.getElementById('toggleLink').addEventListener('click', arguments.callee);
+            document.getElementById('toggleLink').addEventListener('click', handleToggle);
             authError.textContent = '';
-        });
+        }
+        toggleLink.addEventListener('click', handleToggle);
 
         // ログイン状態の監視
         onAuthStateChanged(auth, (user) => {
