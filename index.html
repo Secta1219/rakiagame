@@ -564,7 +564,7 @@
                         <div class="best-score-value" id="bestScoreResult">0 回</div>
                     </div>
                     <div style="margin-top: 20px;">
-                        <button class="control-button secondary" id="registerButton">ランキング登録</button>
+                        <button class="control-button secondary" id="registerButton" style="display: none;">ランキング登録</button>
                     </div>
                     <div class="register-status" id="registerStatus"></div>
                     <button class="control-button" id="retryButton" style="margin-top: 10px;">もう一度</button>
@@ -822,9 +822,11 @@
                 setBestScore(clickCount);
                 updateBestScoreDisplay();
                 newRecordDisplay.classList.add('show');
+                registerButton.style.display = 'inline-block';
                 createConfetti();
             } else {
                 newRecordDisplay.classList.remove('show');
+                registerButton.style.display = 'none';
             }
 
             showScreen(resultScreen);
