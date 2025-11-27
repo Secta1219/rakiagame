@@ -91,6 +91,64 @@
             background: var(--bg-card);
         }
 
+        /* 認証エリア */
+        .auth-area {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .login-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .login-btn:hover {
+            background: #e55a2b;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            font-size: 0.85rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-card);
+        }
+
+        .user-name {
+            color: #fff;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .logout-btn:hover {
+            color: #fff;
+            border-color: var(--text-dim);
+        }
+
         /* メインコンテンツ */
         main {
             max-width: 1200px;
@@ -276,6 +334,9 @@
                 <a href="./ranking/">ランキング</a>
                 <a href="./about/">About</a>
             </nav>
+            <div class="auth-area" id="authArea">
+                <button class="login-btn" id="loginBtn">ログイン</button>
+            </div>
         </div>
     </header>
 
@@ -321,5 +382,67 @@
             <p>Made with fun</p>
         </div>
     </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvw5QmcshEf7sdy6YGgVK0Tkd_QaYmEoc",
+            authDomain: "fir-clicks-b5462.firebaseapp.com",
+            projectId: "fir-clicks-b5462",
+            storageBucket: "fir-clicks-b5462.firebasestorage.app",
+            messagingSenderId: "487554205426",
+            appId: "1:487554205426:web:b454471e0464f654c2326b",
+            measurementId: "G-V6CZDKSNYQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        const authArea = document.getElementById('authArea');
+        const loginBtn = document.getElementById('loginBtn');
+
+        // ログイン状態の監視
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // ログイン中
+                authArea.innerHTML = `
+                    <div class="user-info">
+                        <img src="${user.photoURL || ''}" alt="" class="user-avatar" referrerpolicy="no-referrer">
+                        <span class="user-name">${user.displayName || 'ユーザー'}</span>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">ログアウト</button>
+                `;
+                document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            } else {
+                // 未ログイン
+                authArea.innerHTML = `<button class="login-btn" id="loginBtn">ログイン</button>`;
+                document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            }
+        });
+
+        // Googleログイン
+        async function handleLogin() {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error('ログインエラー:', error);
+            }
+        }
+
+        // ログアウト
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('ログアウトエラー:', error);
+            }
+        }
+
+        // 初期イベント設定
+        loginBtn.addEventListener('click', handleLogin);
+    </script>
 </body>
 </html>
