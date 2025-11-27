@@ -691,7 +691,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, addDoc, query, orderBy, limit, getDocs, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -710,8 +710,27 @@
 
         // ログインユーザー情報
         let currentUser = null;
-        onAuthStateChanged(auth, (user) => {
+        let userProfile = null;
+
+        // ユーザープロフィール取得
+        async function getUserProfile(uid) {
+            try {
+                const docRef = doc(db, 'users', uid);
+                const docSnap = await getDoc(docRef);
+                return docSnap.exists() ? docSnap.data() : null;
+            } catch (error) {
+                console.error('プロフィール取得エラー:', error);
+                return null;
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
+            if (user) {
+                userProfile = await getUserProfile(user.uid);
+            } else {
+                userProfile = null;
+            }
         });
 
         const GAME_DURATION = 10000;
@@ -864,16 +883,41 @@
 
         async function submitScore(name, score) {
             try {
-                const docData = {
-                    name: name.slice(0, 20),
-                    score: score,
-                    timestamp: serverTimestamp()
-                };
-                // ログイン中ならユーザーIDも保存
-                if (currentUser) {
-                    docData.uid = currentUser.uid;
+                if (currentUser && userProfile) {
+                    // ログインユーザー: UIDをドキュメントIDとして使用（1人1スコア）
+                    const docRef = doc(db, 'rankings', currentUser.uid);
+                    const existingDoc = await getDoc(docRef);
+
+                    if (existingDoc.exists()) {
+                        // 既存スコアより高い場合のみ更新
+                        if (score > existingDoc.data().score) {
+                            await setDoc(docRef, {
+                                name: userProfile.displayName,
+                                score: score,
+                                uid: currentUser.uid,
+                                timestamp: serverTimestamp()
+                            });
+                        } else {
+                            // スコアが低い場合は更新しない（成功扱い）
+                            return true;
+                        }
+                    } else {
+                        // 新規登録
+                        await setDoc(docRef, {
+                            name: userProfile.displayName,
+                            score: score,
+                            uid: currentUser.uid,
+                            timestamp: serverTimestamp()
+                        });
+                    }
+                } else {
+                    // 未ログインユーザー: 従来通り
+                    await addDoc(collection(db, 'rankings'), {
+                        name: name.slice(0, 20),
+                        score: score,
+                        timestamp: serverTimestamp()
+                    });
                 }
-                await addDoc(collection(db, 'rankings'), docData);
                 return true;
             } catch (error) {
                 console.error('スコア登録エラー:', error);
@@ -986,15 +1030,9 @@
 
         function showModal() {
             const loginStatus = document.getElementById('loginStatus');
-            // ログイン中なら表示名を使用、なければlocalStorageから取得
-            if (currentUser) {
-                const displayName = currentUser.displayName || currentUser.email?.split('@')[0] || '';
-                playerNameInput.value = displayName || getLastName();
-                loginStatus.textContent = 'ログイン中 - 名前は自動保存されます';
-            } else {
-                playerNameInput.value = getLastName();
-                loginStatus.textContent = '';
-            }
+            // 未ログインユーザー用（ログインユーザーはモーダルをスキップ）
+            playerNameInput.value = getLastName();
+            loginStatus.textContent = '';
             nameModal.classList.add('show');
             setTimeout(() => playerNameInput.focus(), 100);
         }
@@ -1015,8 +1053,28 @@
             }
         }, { passive: false });
 
-        registerButton.addEventListener('click', () => {
-            if (!scoreRegistered) {
+        registerButton.addEventListener('click', async () => {
+            if (scoreRegistered) return;
+
+            if (currentUser && userProfile) {
+                // ログインユーザー: モーダルスキップ、直接登録
+                registerButton.disabled = true;
+                registerButton.textContent = '登録中...';
+
+                const success = await submitScore(null, currentScore);
+                if (success) {
+                    scoreRegistered = true;
+                    registerStatus.textContent = '登録しました！';
+                    registerStatus.className = 'register-status success';
+                    await updateRankings(true);
+                } else {
+                    registerStatus.textContent = '登録に失敗しました';
+                    registerStatus.className = 'register-status error';
+                    registerButton.disabled = false;
+                }
+                registerButton.textContent = 'ランキング登録';
+            } else {
+                // 未ログイン: モーダル表示
                 showModal();
             }
         });

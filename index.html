@@ -533,6 +533,17 @@
         </div>
     </footer>
 
+    <!-- ユーザーネーム設定モーダル -->
+    <div class="modal-overlay" id="usernameModal">
+        <div class="modal">
+            <h2 class="modal-title">ユーザーネームを設定</h2>
+            <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; text-align: center;">ランキングに表示される名前です</p>
+            <input type="text" class="auth-input" id="usernameInput" placeholder="ユーザーネーム" maxlength="20" required>
+            <p class="auth-error" id="usernameError"></p>
+            <button class="auth-submit" id="saveUsernameBtn" style="margin-top: 16px;">決定</button>
+        </div>
+    </div>
+
     <!-- ログインモーダル -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal">
@@ -562,6 +573,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqlOPEvdpg8rlgrT0bt1cUzRH2jKtfRqw",
@@ -575,11 +587,16 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
         // DOM要素
         const authArea = document.getElementById('authArea');
         const loginModal = document.getElementById('loginModal');
+        const usernameModal = document.getElementById('usernameModal');
+        const usernameInput = document.getElementById('usernameInput');
+        const usernameError = document.getElementById('usernameError');
+        const saveUsernameBtn = document.getElementById('saveUsernameBtn');
         const modalTitle = document.getElementById('modalTitle');
         const emailForm = document.getElementById('emailForm');
         const emailInput = document.getElementById('emailInput');
@@ -627,26 +644,112 @@
         }
         toggleLink.addEventListener('click', handleToggle);
 
+        // ユーザープロフィール取得
+        async function getUserProfile(uid) {
+            try {
+                const docRef = doc(db, 'users', uid);
+                const docSnap = await getDoc(docRef);
+                return docSnap.exists() ? docSnap.data() : null;
+            } catch (error) {
+                console.error('プロフィール取得エラー:', error);
+                return null;
+            }
+        }
+
+        // ユーザープロフィール保存
+        async function saveUserProfile(uid, displayName) {
+            try {
+                await setDoc(doc(db, 'users', uid), {
+                    displayName: displayName,
+                    createdAt: new Date()
+                }, { merge: true });
+                return true;
+            } catch (error) {
+                console.error('プロフィール保存エラー:', error);
+                return false;
+            }
+        }
+
+        // ユーザーネームモーダル表示
+        function showUsernameModal(user) {
+            // 初期値としてGoogleの名前やメールを入れる
+            usernameInput.value = user.displayName || user.email?.split('@')[0] || '';
+            usernameModal.classList.add('active');
+            setTimeout(() => usernameInput.focus(), 100);
+        }
+
+        function closeUsernameModal() {
+            usernameModal.classList.remove('active');
+            usernameError.textContent = '';
+        }
+
+        // ヘッダー表示更新
+        function updateAuthUI(displayName, photoURL) {
+            const avatarHtml = photoURL
+                ? `<img src="${photoURL}" alt="" class="user-avatar" referrerpolicy="no-referrer">`
+                : `<div class="user-avatar" style="display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:bold;">${(displayName || 'U')[0].toUpperCase()}</div>`;
+            authArea.innerHTML = `
+                <div class="user-info">
+                    ${avatarHtml}
+                    <span class="user-name">${displayName}</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">ログアウト</button>
+            `;
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        }
+
         // ログイン状態の監視
-        onAuthStateChanged(auth, (user) => {
+        let currentUserRef = null;
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 closeModal();
-                const avatarUrl = user.photoURL || '';
-                const avatarHtml = avatarUrl
-                    ? `<img src="${avatarUrl}" alt="" class="user-avatar" referrerpolicy="no-referrer">`
-                    : `<div class="user-avatar" style="display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:bold;">${(user.displayName || user.email || 'U')[0].toUpperCase()}</div>`;
-                authArea.innerHTML = `
-                    <div class="user-info">
-                        ${avatarHtml}
-                        <span class="user-name">${user.displayName || user.email || 'ユーザー'}</span>
-                    </div>
-                    <button class="logout-btn" id="logoutBtn">ログアウト</button>
-                `;
-                document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+                currentUserRef = user;
+
+                // プロフィール確認
+                const profile = await getUserProfile(user.uid);
+                if (profile && profile.displayName) {
+                    // 既存ユーザー
+                    updateAuthUI(profile.displayName, user.photoURL);
+                } else {
+                    // 新規ユーザー → ユーザーネーム設定
+                    showUsernameModal(user);
+                }
             } else {
+                currentUserRef = null;
                 authArea.innerHTML = `<button class="login-btn" id="loginBtn">ログイン</button>`;
                 document.getElementById('loginBtn').addEventListener('click', openModal);
             }
+        });
+
+        // ユーザーネーム保存ボタン
+        saveUsernameBtn.addEventListener('click', async () => {
+            const name = usernameInput.value.trim();
+            if (!name) {
+                usernameError.textContent = 'ユーザーネームを入力してください';
+                return;
+            }
+            if (name.length < 2) {
+                usernameError.textContent = '2文字以上で入力してください';
+                return;
+            }
+
+            saveUsernameBtn.disabled = true;
+            saveUsernameBtn.textContent = '保存中...';
+
+            const success = await saveUserProfile(currentUserRef.uid, name);
+            if (success) {
+                closeUsernameModal();
+                updateAuthUI(name, currentUserRef.photoURL);
+            } else {
+                usernameError.textContent = '保存に失敗しました';
+            }
+
+            saveUsernameBtn.disabled = false;
+            saveUsernameBtn.textContent = '決定';
+        });
+
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveUsernameBtn.click();
         });
 
         // Googleログイン
