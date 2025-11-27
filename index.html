@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>10秒クリックチャレンジ</title>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9155865843934014"
+         crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* 広告付きレイアウト */
+        .page-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .ad-side {
+            width: 160px;
+            min-height: 600px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 20px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .ad-label {
+            font-size: 0.7rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        /* スマホでは広告非表示 */
+        @media (max-width: 900px) {
+            .ad-side {
+                display: none;
+            }
+            .page-wrapper {
+                padding: 10px;
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px 25px;
+            flex: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .timer {
+            color: #4ade80;
+            transition: color 0.3s;
+        }
+
+        .timer.warning {
+            color: #fbbf24;
+        }
+
+        .timer.danger {
+            color: #ef4444;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .click-count {
+            color: #60a5fa;
+        }
+
+        .click-button {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4),
+                        inset 0 -5px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        .click-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3),
+                        inset 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .click-button:disabled {
+            background: linear-gradient(145deg, #4b5563, #374151);
+            cursor: not-allowed;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .click-button.clicked {
+            animation: clickPop 0.15s ease-out;
+        }
+
+        @keyframes clickPop {
+            0% { transform: scale(0.95); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .control-button {
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .control-button:active {
+            transform: translateY(0);
+        }
+
+        .control-button:disabled {
+            background: linear-gradient(145deg, #4b5563, #374151);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .control-button.secondary {
+            background: linear-gradient(145deg, #6366f1, #4f46e5);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .control-button.secondary:hover {
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        .best-score {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .best-score-label {
+            font-size: 0.85rem;
+            color: #fbbf24;
+        }
+
+        .best-score-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fcd34d;
+        }
+
+        .result-screen {
+            display: none;
+        }
+
+        .result-screen.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .final-score {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #60a5fa;
+            margin: 20px 0;
+            text-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
+        }
+
+        .cps {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .new-record {
+            display: none;
+            color: #fcd34d;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+            animation: newRecordPulse 1s ease-in-out infinite;
+        }
+
+        .new-record.show {
+            display: block;
+        }
+
+        @keyframes newRecordPulse {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 0 0 20px rgba(252, 211, 77, 0.5);
+            }
+            50% {
+                transform: scale(1.1);
+                text-shadow: 0 0 40px rgba(252, 211, 77, 0.8);
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confettiFall 3s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ランキング */
+        .ranking-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ranking-title {
+            font-size: 1.2rem;
+            color: #fbbf24;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ranking-list {
+            list-style: none;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+
+        .ranking-item:nth-child(1) {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .ranking-item:nth-child(2) {
+            background: rgba(192, 192, 192, 0.15);
+            border: 1px solid rgba(192, 192, 192, 0.3);
+        }
+
+        .ranking-item:nth-child(3) {
+            background: rgba(205, 127, 50, 0.15);
+            border: 1px solid rgba(205, 127, 50, 0.3);
+        }
+
+        .ranking-rank {
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 35px;
+            text-align: center;
+        }
+
+        .ranking-item:nth-child(1) .ranking-rank { color: #fcd34d; }
+        .ranking-item:nth-child(2) .ranking-rank { color: #d1d5db; }
+        .ranking-item:nth-child(3) .ranking-rank { color: #d97706; }
+
+        .ranking-name {
+            flex: 1;
+            text-align: left;
+            margin-left: 10px;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ranking-score {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .ranking-loading {
+            color: #aaa;
+            padding: 20px;
+        }
+
+        .ranking-empty {
+            color: #888;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* モーダル */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 350px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+
+        .modal input::placeholder {
+            color: #888;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-buttons button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .modal-buttons button:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-submit {
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        .register-status {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        .register-status.success {
+            color: #4ade80;
+        }
+
+        .register-status.error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- 左サイド広告 -->
+        <aside class="ad-side ad-left">
+            <div class="ad-label">広告</div>
+            <!-- 左サイド広告ユニット（審査通過後に設置） -->
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:160px;height:600px"
+                 data-ad-client="ca-pub-9155865843934014"
+                 data-ad-slot="LEFT_AD_SLOT"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <div class="container">
+            <h1>10秒クリックチャレンジ</h1>
+
+            <!-- 待機画面 -->
+            <div id="startScreen">
+                <p style="color: #aaa; margin: 20px 0;">10秒間で何回クリックできるかな？</p>
+                <button class="control-button" id="startButton">スタート</button>
+                <div class="best-score">
+                    <div class="best-score-label">自己ベスト</div>
+                    <div class="best-score-value" id="bestScoreStart">0 回</div>
+                </div>
+
+                <!-- ランキング表示 -->
+                <div class="ranking-section">
+                    <div class="ranking-title">ランキング TOP10</div>
+                    <ul class="ranking-list" id="rankingListStart">
+                        <li class="ranking-loading">読み込み中...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ゲーム画面 -->
+            <div id="gameScreen" class="hidden">
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-label">残り時間</div>
+                        <div class="stat-value timer" id="timer">10.0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">クリック数</div>
+                        <div class="stat-value click-count" id="clickCount">0</div>
+                    </div>
+                </div>
+                <button class="click-button" id="clickButton">
+                    クリック！
+                </button>
+                <div class="cps">CPS: <span id="liveCps">0.0</span></div>
+            </div>
+
+            <!-- 結果画面 -->
+            <div id="resultScreen" class="hidden">
+                <div class="result-screen show">
+                    <p style="font-size: 1.2rem; color: #aaa;">結果</p>
+                    <div class="final-score" id="finalScore">0</div>
+                    <div class="cps">CPS (クリック/秒): <span id="finalCps">0.0</span></div>
+                    <div class="new-record" id="newRecord">新記録！</div>
+                    <div class="best-score">
+                        <div class="best-score-label">自己ベスト</div>
+                        <div class="best-score-value" id="bestScoreResult">0 回</div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="control-button secondary" id="registerButton">ランキング登録</button>
+                    </div>
+                    <div class="register-status" id="registerStatus"></div>
+                    <button class="control-button" id="retryButton" style="margin-top: 10px;">もう一度</button>
+
+                    <!-- 結果画面のランキング -->
+                    <div class="ranking-section">
+                        <div class="ranking-title">ランキング TOP10</div>
+                        <ul class="ranking-list" id="rankingListResult">
+                            <li class="ranking-loading">読み込み中...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右サイド広告 -->
+        <aside class="ad-side ad-right">
+            <div class="ad-label">広告</div>
+            <!-- 右サイド広告ユニット（審査通過後に設置） -->
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:160px;height:600px"
+                 data-ad-client="ca-pub-9155865843934014"
+                 data-ad-slot="RIGHT_AD_SLOT"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </aside>
+    </div>
+
+    <!-- 名前入力モーダル -->
+    <div class="modal-overlay" id="nameModal">
+        <div class="modal">
+            <h2>名前を入力</h2>
+            <input type="text" id="playerName" placeholder="ニックネーム" maxlength="20" autocomplete="off">
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="cancelRegister">キャンセル</button>
+                <button class="btn-submit" id="submitScore">登録</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyBvw5QmcshEf7sdy6YGgVK0Tkd_QaYmEoc",
+            authDomain: "fir-clicks-b5462.firebaseapp.com",
+            projectId: "fir-clicks-b5462",
+            storageBucket: "fir-clicks-b5462.firebasestorage.app",
+            messagingSenderId: "487554205426",
+            appId: "1:487554205426:web:b454471e0464f654c2326b",
+            measurementId: "G-V6CZDKSNYQ"
+        };
+
+        // Firebase初期化
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ゲーム状態
+        const GAME_DURATION = 10000;
+        let clickCount = 0;
+        let startTime = null;
+        let gameActive = false;
+        let currentScore = 0;
+        let scoreRegistered = false;
+
+        // DOM要素
+        const startScreen = document.getElementById('startScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const startButton = document.getElementById('startButton');
+        const clickButton = document.getElementById('clickButton');
+        const retryButton = document.getElementById('retryButton');
+        const timerDisplay = document.getElementById('timer');
+        const clickCountDisplay = document.getElementById('clickCount');
+        const liveCpsDisplay = document.getElementById('liveCps');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const finalCpsDisplay = document.getElementById('finalCps');
+        const newRecordDisplay = document.getElementById('newRecord');
+        const bestScoreStart = document.getElementById('bestScoreStart');
+        const bestScoreResult = document.getElementById('bestScoreResult');
+        const registerButton = document.getElementById('registerButton');
+        const registerStatus = document.getElementById('registerStatus');
+        const nameModal = document.getElementById('nameModal');
+        const playerNameInput = document.getElementById('playerName');
+        const submitScoreButton = document.getElementById('submitScore');
+        const cancelRegisterButton = document.getElementById('cancelRegister');
+        const rankingListStart = document.getElementById('rankingListStart');
+        const rankingListResult = document.getElementById('rankingListResult');
+
+        // LocalStorageからハイスコアを取得
+        function getBestScore() {
+            return parseInt(localStorage.getItem('clickChallengeBestScore') || '0', 10);
+        }
+
+        function setBestScore(score) {
+            localStorage.setItem('clickChallengeBestScore', score.toString());
+        }
+
+        // 前回の名前を取得
+        function getLastName() {
+            return localStorage.getItem('clickChallengeLastName') || '';
+        }
+
+        function setLastName(name) {
+            localStorage.setItem('clickChallengeLastName', name);
+        }
+
+        function updateBestScoreDisplay() {
+            const best = getBestScore();
+            bestScoreStart.textContent = `${best} 回`;
+            bestScoreResult.textContent = `${best} 回`;
+        }
+
+        function showScreen(screen) {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            screen.classList.remove('hidden');
+        }
+
+        // ランキング取得
+        async function loadRanking() {
+            try {
+                const q = query(
+                    collection(db, 'rankings'),
+                    orderBy('score', 'desc'),
+                    limit(10)
+                );
+                const snapshot = await getDocs(q);
+                const rankings = [];
+                snapshot.forEach(doc => {
+                    rankings.push(doc.data());
+                });
+                return rankings;
+            } catch (error) {
+                console.error('ランキング取得エラー:', error);
+                return null;
+            }
+        }
+
+        // ランキング表示
+        function renderRanking(rankings, listElement) {
+            if (rankings === null) {
+                listElement.innerHTML = '<li class="ranking-empty">取得に失敗しました</li>';
+                return;
+            }
+            if (rankings.length === 0) {
+                listElement.innerHTML = '<li class="ranking-empty">まだ記録がありません</li>';
+                return;
+            }
+
+            listElement.innerHTML = rankings.map((r, i) => `
+                <li class="ranking-item">
+                    <span class="ranking-rank">${i + 1}</span>
+                    <span class="ranking-name">${escapeHtml(r.name)}</span>
+                    <span class="ranking-score">${r.score} 回</span>
+                </li>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 両方のランキングを更新
+        async function updateRankings() {
+            const rankings = await loadRanking();
+            renderRanking(rankings, rankingListStart);
+            renderRanking(rankings, rankingListResult);
+        }
+
+        // スコア登録
+        async function submitScore(name, score) {
+            try {
+                await addDoc(collection(db, 'rankings'), {
+                    name: name.slice(0, 20),
+                    score: score,
+                    timestamp: serverTimestamp()
+                });
+                return true;
+            } catch (error) {
+                console.error('スコア登録エラー:', error);
+                return false;
+            }
+        }
+
+        // ゲーム開始
+        function startGame() {
+            clickCount = 0;
+            gameActive = true;
+            scoreRegistered = false;
+            startTime = performance.now();
+
+            clickCountDisplay.textContent = '0';
+            timerDisplay.textContent = '10.0';
+            timerDisplay.className = 'stat-value timer';
+            liveCpsDisplay.textContent = '0.0';
+            clickButton.disabled = false;
+            registerButton.disabled = false;
+            registerStatus.textContent = '';
+            registerStatus.className = 'register-status';
+
+            showScreen(gameScreen);
+
+            function updateTimer() {
+                if (!gameActive) return;
+
+                const elapsed = performance.now() - startTime;
+                const remaining = Math.max(0, GAME_DURATION - elapsed);
+                const remainingSeconds = remaining / 1000;
+
+                timerDisplay.textContent = remainingSeconds.toFixed(1);
+
+                if (remainingSeconds <= 1) {
+                    timerDisplay.className = 'stat-value timer danger';
+                } else if (remainingSeconds <= 3) {
+                    timerDisplay.className = 'stat-value timer warning';
+                } else {
+                    timerDisplay.className = 'stat-value timer';
+                }
+
+                if (elapsed > 0) {
+                    const cps = (clickCount / (elapsed / 1000)).toFixed(1);
+                    liveCpsDisplay.textContent = cps;
+                }
+
+                if (remaining > 0) {
+                    requestAnimationFrame(updateTimer);
+                } else {
+                    endGame();
+                }
+            }
+
+            requestAnimationFrame(updateTimer);
+        }
+
+        // ゲーム終了
+        function endGame() {
+            gameActive = false;
+            clickButton.disabled = true;
+            currentScore = clickCount;
+
+            const finalCps = (clickCount / 10).toFixed(1);
+            finalScoreDisplay.textContent = clickCount;
+            finalCpsDisplay.textContent = finalCps;
+
+            const bestScore = getBestScore();
+            const isNewRecord = clickCount > bestScore;
+
+            if (isNewRecord) {
+                setBestScore(clickCount);
+                updateBestScoreDisplay();
+                newRecordDisplay.classList.add('show');
+                createConfetti();
+            } else {
+                newRecordDisplay.classList.remove('show');
+            }
+
+            showScreen(resultScreen);
+            updateRankings();
+        }
+
+        function createConfetti() {
+            const colors = ['#fcd34d', '#60a5fa', '#34d399', '#f472b6', '#a78bfa'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        function handleClick(e) {
+            if (!gameActive) return;
+            e.preventDefault();
+            clickCount++;
+            clickCountDisplay.textContent = clickCount;
+            clickButton.classList.remove('clicked');
+            void clickButton.offsetWidth;
+            clickButton.classList.add('clicked');
+        }
+
+        // モーダル表示
+        function showModal() {
+            playerNameInput.value = getLastName();
+            nameModal.classList.add('show');
+            setTimeout(() => playerNameInput.focus(), 100);
+        }
+
+        function hideModal() {
+            nameModal.classList.remove('show');
+        }
+
+        // イベントリスナー
+        startButton.addEventListener('click', startGame);
+        retryButton.addEventListener('click', startGame);
+
+        clickButton.addEventListener('mousedown', handleClick);
+        clickButton.addEventListener('touchstart', handleClick, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (e.target === clickButton) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        registerButton.addEventListener('click', () => {
+            if (!scoreRegistered) {
+                showModal();
+            }
+        });
+
+        cancelRegisterButton.addEventListener('click', hideModal);
+
+        nameModal.addEventListener('click', (e) => {
+            if (e.target === nameModal) {
+                hideModal();
+            }
+        });
+
+        submitScoreButton.addEventListener('click', async () => {
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                playerNameInput.focus();
+                return;
+            }
+
+            submitScoreButton.disabled = true;
+            submitScoreButton.textContent = '登録中...';
+
+            const success = await submitScore(name, currentScore);
+
+            if (success) {
+                setLastName(name);
+                scoreRegistered = true;
+                hideModal();
+                registerStatus.textContent = '登録しました！';
+                registerStatus.className = 'register-status success';
+                registerButton.disabled = true;
+                await updateRankings();
+            } else {
+                registerStatus.textContent = '登録に失敗しました';
+                registerStatus.className = 'register-status error';
+            }
+
+            submitScoreButton.disabled = false;
+            submitScoreButton.textContent = '登録';
+        });
+
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitScoreButton.click();
+            }
+        });
+
+        // 初期化
+        updateBestScoreDisplay();
+        updateRankings();
+    </script>
+</body>
+</html>
