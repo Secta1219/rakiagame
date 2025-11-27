@@ -414,18 +414,7 @@
 
                 <div class="section">
                     <h3 class="section-title">アバター</h3>
-
-                    <p class="avatar-category">猫</p>
-                    <div class="avatar-grid" id="catAvatars"></div>
-
-                    <p class="avatar-category">犬</p>
-                    <div class="avatar-grid" id="dogAvatars"></div>
-
-                    <p class="avatar-category">ロボット</p>
-                    <div class="avatar-grid" id="robotAvatars"></div>
-
-                    <p class="avatar-category">幾何学</p>
-                    <div class="avatar-grid" id="geoAvatars"></div>
+                    <div class="avatar-grid" id="allAvatars"></div>
                 </div>
             </div>
         </div>
@@ -643,11 +632,9 @@
                 // ランキング成績を読み込み
                 loadUserStats(user.uid);
 
-                // アバターグリッド生成
-                renderAvatarGrid('catAvatars', avatars.cat);
-                renderAvatarGrid('dogAvatars', avatars.dog);
-                renderAvatarGrid('robotAvatars', avatars.robot);
-                renderAvatarGrid('geoAvatars', avatars.geo);
+                // 全アバターを1つのグリッドに
+                const allAvatarsList = [...avatars.cat, ...avatars.dog, ...avatars.robot, ...avatars.geo];
+                renderAvatarGrid('allAvatars', allAvatarsList);
             } else {
                 currentUser = null;
                 loginRequired.style.display = 'block';

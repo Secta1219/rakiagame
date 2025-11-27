@@ -91,6 +91,20 @@
             background: var(--bg-card);
         }
 
+        .auth-area { margin-left: auto; opacity: 0; transition: opacity 0.15s ease; }
+        .auth-area.ready { opacity: 1; }
+        .login-btn { background: var(--accent); color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; }
+        .user-name { color: #fff; }
+        .user-dropdown { position: relative; }
+        .user-dropdown-btn { display: flex; align-items: center; gap: 10px; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+        .user-dropdown-btn:hover { background: var(--bg-card); }
+        .user-dropdown-menu { display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; min-width: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 200; overflow: hidden; }
+        .user-dropdown-menu.show { display: block; }
+        .user-dropdown-menu a, .user-dropdown-menu button { display: block; width: 100%; padding: 12px 16px; text-align: left; color: var(--text); text-decoration: none; background: none; border: none; font-size: 0.9rem; cursor: pointer; }
+        .user-dropdown-menu a:hover, .user-dropdown-menu button:hover { background: var(--bg-card-hover); }
+        .user-dropdown-menu .divider { height: 1px; background: var(--border); margin: 4px 0; }
+
         /* メインコンテンツ */
         main {
             max-width: 800px;
@@ -309,6 +323,7 @@
                 <a href="./" class="active">ランキング</a>
                 <a href="../about/">About</a>
             </nav>
+            <div class="auth-area" id="authArea"></div>
         </div>
     </header>
 
@@ -344,7 +359,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqlOPEvdpg8rlgrT0bt1cUzRH2jKtfRqw",
@@ -358,6 +374,45 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        const authArea = document.getElementById('authArea');
+
+        // 認証UI
+        async function getUserProfile(uid) {
+            try {
+                const docSnap = await getDoc(doc(db, 'users', uid));
+                return docSnap.exists() ? docSnap.data() : null;
+            } catch { return null; }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const profile = await getUserProfile(user.uid);
+                const name = profile?.displayName || 'ユーザー';
+                const avatarId = profile?.avatarId || 'cat-orange';
+                authArea.innerHTML = `
+                    <div class="user-dropdown">
+                        <button class="user-dropdown-btn" id="userDropdownBtn">
+                            <img src="../images/avatars/${avatarId}.svg" class="user-avatar">
+                            <span class="user-name">${name}</span>
+                        </button>
+                        <div class="user-dropdown-menu" id="userDropdownMenu">
+                            <a href="../profile/">プロフィール</a>
+                            <div class="divider"></div>
+                            <button id="logoutBtn">ログアウト</button>
+                        </div>
+                    </div>`;
+                document.getElementById('userDropdownBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('userDropdownMenu').classList.toggle('show');
+                });
+                document.addEventListener('click', () => document.getElementById('userDropdownMenu').classList.remove('show'));
+                document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+            } else {
+                authArea.innerHTML = '<a href="../" class="login-btn">ログイン</a>';
+            }
+            authArea.classList.add('ready');
+        });
 
         const RANKING_CACHE_DURATION = 15 * 60 * 1000; // 15分
 
