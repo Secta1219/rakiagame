@@ -1,10 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C \"I:/rakiagame\" add .)",
-      "Bash(git -C \"I:/rakiagame\" commit -m \"$(cat <<''EOF''\nAdd Google login to main page\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git -C \"I:/rakiagame\" push)",
-      "Bash(git -C \"I:/rakiagame\" commit -m \"$(cat <<''EOF''\nSwitch to new Firebase project (rakiagames)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
