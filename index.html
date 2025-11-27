@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ゲームセレクト</title>
+    <title>Rakia Games</title>
     <style>
         * {
             margin: 0;
@@ -11,148 +11,311 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-dark: #0d0d0d;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #252525;
+            --accent: #ff6b35;
+            --accent-dim: rgba(255, 107, 53, 0.15);
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --border: #2a2a2a;
+        }
+
         body {
             font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: var(--bg-dark);
             min-height: 100vh;
+            color: var(--text);
+        }
+
+        /* ヘッダー */
+        header {
+            background: var(--bg-dark);
+            padding: 0 40px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            justify-content: center;
             align-items: center;
+            height: 60px;
+            gap: 50px;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
             color: #fff;
-            padding: 20px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .container {
-            text-align: center;
-            max-width: 800px;
-            width: 100%;
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.9rem;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        nav {
+            display: flex;
+            gap: 8px;
         }
 
-        .subtitle {
-            color: #aaa;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
+        nav a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.15s;
         }
 
+        nav a:hover, nav a.active {
+            color: #fff;
+            background: var(--bg-card);
+        }
+
+        /* メインコンテンツ */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* ゲームグリッド */
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 20px 0;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
         }
 
+        /* ゲームカード */
         .game-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 30px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
             text-decoration: none;
-            color: #fff;
-            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            color: inherit;
+            transition: all 0.2s;
+            border: 1px solid transparent;
         }
 
         .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
         }
 
-        .game-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+        .game-thumbnail {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            background: #111;
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        .game-card.click-challenge .game-icon {
-            background: linear-gradient(145deg, #3b82f6, #1d4ed8);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        .game-thumbnail img {
+            width: 50%;
+            height: 50%;
+            object-fit: contain;
+            transition: transform 0.2s;
         }
 
-        .game-card.coming-soon .game-icon {
-            background: linear-gradient(145deg, #4b5563, #374151);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        .game-card:hover .game-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .game-thumbnail .placeholder {
+            font-size: 3rem;
+            color: #333;
+        }
+
+        .game-info {
+            padding: 16px;
         }
 
         .game-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .game-description {
-            color: #aaa;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
             line-height: 1.5;
+            margin-bottom: 12px;
         }
 
+        .game-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: var(--accent-dim);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Coming Soon */
         .game-card.coming-soon {
-            opacity: 0.5;
-            cursor: not-allowed;
+            opacity: 0.4;
+            pointer-events: none;
         }
 
-        .game-card.coming-soon:hover {
-            transform: none;
-            box-shadow: none;
-            background: rgba(255, 255, 255, 0.08);
+        /* フッター */
+        footer {
+            background: var(--bg-card);
+            padding: 24px 40px;
+            margin-top: 80px;
+            border-top: 1px solid var(--border);
         }
 
-        .badge {
-            background: linear-gradient(145deg, #10b981, #059669);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-top: 15px;
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
         }
 
-        .badge.soon {
-            background: linear-gradient(145deg, #6b7280, #4b5563);
-        }
-
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8rem;
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 20px;
             }
+
+            .header-content {
+                gap: 20px;
+            }
+
+            nav a {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            main {
+                padding: 24px 20px;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+
             .games-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            footer {
+                padding: 20px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Game Select</h1>
-        <p class="subtitle">遊びたいゲームを選んでね</p>
+    <header>
+        <div class="header-content">
+            <a href="./" class="logo">
+                <span class="logo-icon">R</span>
+                Rakia Games
+            </a>
+            <nav>
+                <a href="./" class="active">ゲーム</a>
+                <a href="#">ランキング</a>
+                <a href="#">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1 class="page-title">ゲームライブラリ</h1>
+            <p class="page-subtitle">ブラウザで遊べるミニゲーム集</p>
+        </div>
 
         <div class="games-grid">
-            <a href="./click-challenge/" class="game-card click-challenge">
-                <div class="game-icon">👆</div>
-                <div class="game-title">10秒クリックチャレンジ</div>
-                <div class="game-description">10秒間で何回クリックできる？<br>自分の限界に挑戦しよう！</div>
-                <div class="badge">PLAY</div>
+            <a href="./click-challenge/" class="game-card">
+                <div class="game-thumbnail">
+                    <img src="./images/click-challenge.png" alt="10秒クリックチャレンジ">
+                </div>
+                <div class="game-info">
+                    <div class="game-title">10秒クリックチャレンジ</div>
+                    <div class="game-description">10秒間で何回クリックできる？限界に挑戦しよう</div>
+                    <div class="game-tags">
+                        <span class="tag">クリッカー</span>
+                        <span class="tag">スコアアタック</span>
+                    </div>
+                </div>
             </a>
 
             <div class="game-card coming-soon">
-                <div class="game-icon">🎮</div>
-                <div class="game-title">Coming Soon...</div>
-                <div class="game-description">新しいゲームを準備中です。<br>お楽しみに！</div>
-                <div class="badge soon">準備中</div>
+                <div class="game-thumbnail">
+                    <span class="placeholder">?</span>
+                </div>
+                <div class="game-info">
+                    <div class="game-title">Coming Soon</div>
+                    <div class="game-description">新しいゲームを準備中です</div>
+                    <div class="game-tags">
+                        <span class="tag">準備中</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Rakia Games</p>
+            <p>Made with fun</p>
+        </div>
+    </footer>
 </body>
 </html>
