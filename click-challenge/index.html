@@ -478,6 +478,17 @@
             font-weight: 600;
         }
 
+        .login-status {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .login-status:empty {
+            display: none;
+        }
+
         .modal input {
             width: 100%;
             padding: 14px;
@@ -668,6 +679,7 @@
     <div class="modal-overlay" id="nameModal">
         <div class="modal">
             <h2>名前を入力</h2>
+            <p class="login-status" id="loginStatus"></p>
             <input type="text" id="playerName" placeholder="ニックネーム" maxlength="20" autocomplete="off">
             <div class="modal-buttons">
                 <button class="btn-cancel" id="cancelRegister">キャンセル</button>
@@ -680,6 +692,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCqlOPEvdpg8rlgrT0bt1cUzRH2jKtfRqw",
@@ -693,6 +706,13 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ログインユーザー情報
+        let currentUser = null;
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+        });
 
         const GAME_DURATION = 10000;
         const RANKING_CACHE_DURATION = 15 * 60 * 1000; // 15分
@@ -844,11 +864,16 @@
 
         async function submitScore(name, score) {
             try {
-                await addDoc(collection(db, 'rankings'), {
+                const docData = {
                     name: name.slice(0, 20),
                     score: score,
                     timestamp: serverTimestamp()
-                });
+                };
+                // ログイン中ならユーザーIDも保存
+                if (currentUser) {
+                    docData.uid = currentUser.uid;
+                }
+                await addDoc(collection(db, 'rankings'), docData);
                 return true;
             } catch (error) {
                 console.error('スコア登録エラー:', error);
@@ -960,7 +985,16 @@
         }
 
         function showModal() {
-            playerNameInput.value = getLastName();
+            const loginStatus = document.getElementById('loginStatus');
+            // ログイン中なら表示名を使用、なければlocalStorageから取得
+            if (currentUser) {
+                const displayName = currentUser.displayName || currentUser.email?.split('@')[0] || '';
+                playerNameInput.value = displayName || getLastName();
+                loginStatus.textContent = 'ログイン中 - 名前は自動保存されます';
+            } else {
+                playerNameInput.value = getLastName();
+                loginStatus.textContent = '';
+            }
             nameModal.classList.add('show');
             setTimeout(() => playerNameInput.focus(), 100);
         }
