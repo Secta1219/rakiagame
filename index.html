@@ -149,6 +149,72 @@
             border-color: var(--text-dim);
         }
 
+        /* ユーザードロップダウン */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .user-dropdown-btn:hover {
+            background: var(--bg-card);
+        }
+
+        .user-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-width: 160px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .user-dropdown-menu.show {
+            display: block;
+        }
+
+        .user-dropdown-menu a,
+        .user-dropdown-menu button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            color: var(--text);
+            text-decoration: none;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .user-dropdown-menu a:hover,
+        .user-dropdown-menu button:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .user-dropdown-menu .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
         /* ログインモーダル */
         .modal-overlay {
             display: none;
@@ -684,17 +750,34 @@
         }
 
         // ヘッダー表示更新
-        function updateAuthUI(displayName, photoURL) {
-            const avatarHtml = photoURL
-                ? `<img src="${photoURL}" alt="" class="user-avatar" referrerpolicy="no-referrer">`
-                : `<div class="user-avatar" style="display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:bold;">${(displayName || 'U')[0].toUpperCase()}</div>`;
+        function updateAuthUI(displayName, avatarId) {
+            const avatarSrc = avatarId ? `./images/avatars/${avatarId}.svg` : './images/avatars/cat-orange.svg';
             authArea.innerHTML = `
-                <div class="user-info">
-                    ${avatarHtml}
-                    <span class="user-name">${displayName}</span>
+                <div class="user-dropdown">
+                    <button class="user-dropdown-btn" id="userDropdownBtn">
+                        <img src="${avatarSrc}" alt="" class="user-avatar">
+                        <span class="user-name">${displayName}</span>
+                    </button>
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <a href="./profile/">プロフィール</a>
+                        <div class="divider"></div>
+                        <button id="logoutBtn">ログアウト</button>
+                    </div>
                 </div>
-                <button class="logout-btn" id="logoutBtn">ログアウト</button>
             `;
+
+            const dropdownBtn = document.getElementById('userDropdownBtn');
+            const dropdownMenu = document.getElementById('userDropdownMenu');
+
+            dropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', () => {
+                dropdownMenu.classList.remove('show');
+            });
+
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
         }
 
@@ -709,7 +792,7 @@
                 const profile = await getUserProfile(user.uid);
                 if (profile && profile.displayName) {
                     // 既存ユーザー
-                    updateAuthUI(profile.displayName, user.photoURL);
+                    updateAuthUI(profile.displayName, profile.avatarId);
                 } else {
                     // 新規ユーザー → ユーザーネーム設定
                     showUsernameModal(user);
@@ -739,7 +822,7 @@
             const success = await saveUserProfile(currentUserRef.uid, name);
             if (success) {
                 closeUsernameModal();
-                updateAuthUI(name, currentUserRef.photoURL);
+                updateAuthUI(name, null);
             } else {
                 usernameError.textContent = '保存に失敗しました';
             }
