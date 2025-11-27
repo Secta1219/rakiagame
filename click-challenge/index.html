@@ -695,11 +695,38 @@
         const db = getFirestore(app);
 
         const GAME_DURATION = 10000;
+        const RANKING_CACHE_DURATION = 15 * 60 * 1000; // 15分
         let clickCount = 0;
         let startTime = null;
         let gameActive = false;
         let currentScore = 0;
         let scoreRegistered = false;
+
+        // ランキングキャッシュ
+        function getRankingCache() {
+            try {
+                const cached = localStorage.getItem('rankingCache');
+                if (!cached) return null;
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp > RANKING_CACHE_DURATION) {
+                    return null; // 期限切れ
+                }
+                return data;
+            } catch {
+                return null;
+            }
+        }
+
+        function setRankingCache(data) {
+            localStorage.setItem('rankingCache', JSON.stringify({
+                data,
+                timestamp: Date.now()
+            }));
+        }
+
+        function clearRankingCache() {
+            localStorage.removeItem('rankingCache');
+        }
 
         const startScreen = document.getElementById('startScreen');
         const gameScreen = document.getElementById('gameScreen');
@@ -753,8 +780,18 @@
             screen.classList.remove('hidden');
         }
 
-        async function loadRanking() {
+        async function loadRanking(force = false) {
+            // キャッシュをチェック（強制更新でなければ）
+            if (!force) {
+                const cached = getRankingCache();
+                if (cached) {
+                    console.log('ランキング: キャッシュから取得');
+                    return cached;
+                }
+            }
+
             try {
+                console.log('ランキング: Firebaseから取得');
                 const q = query(
                     collection(db, 'rankings'),
                     orderBy('score', 'desc'),
@@ -765,6 +802,8 @@
                 snapshot.forEach(doc => {
                     rankings.push(doc.data());
                 });
+                // キャッシュに保存
+                setRankingCache(rankings);
                 return rankings;
             } catch (error) {
                 console.error('ランキング取得エラー:', error);
@@ -797,8 +836,8 @@
             return div.innerHTML;
         }
 
-        async function updateRankings() {
-            const rankings = await loadRanking();
+        async function updateRankings(force = false) {
+            const rankings = await loadRanking(force);
             renderRanking(rankings, rankingListStart);
             renderRanking(rankings, rankingListResult);
         }
@@ -975,7 +1014,7 @@
                 registerStatus.textContent = '登録しました！';
                 registerStatus.className = 'register-status success';
                 registerButton.disabled = true;
-                await updateRankings();
+                await updateRankings(true); // 強制更新
             } else {
                 registerStatus.textContent = '登録に失敗しました';
                 registerStatus.className = 'register-status error';
