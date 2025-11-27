@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 背景 -->
+  <circle cx="50" cy="50" r="48" fill="#ff6b35"/>
+  <!-- 耳（垂れ耳） -->
+  <ellipse cx="22" cy="45" rx="12" ry="20" fill="#fff"/>
+  <ellipse cx="78" cy="45" rx="12" ry="20" fill="#fff"/>
+  <ellipse cx="22" cy="45" rx="8" ry="15" fill="#deb887"/>
+  <ellipse cx="78" cy="45" rx="8" ry="15" fill="#deb887"/>
+  <!-- 顔 -->
+  <ellipse cx="50" cy="52" rx="28" ry="30" fill="#fff"/>
+  <!-- 目 -->
+  <ellipse cx="38" cy="45" rx="5" ry="6" fill="#333"/>
+  <ellipse cx="62" cy="45" rx="5" ry="6" fill="#333"/>
+  <circle cx="40" cy="43" r="2" fill="#fff"/>
+  <circle cx="64" cy="43" r="2" fill="#fff"/>
+  <!-- 鼻 -->
+  <ellipse cx="50" cy="58" rx="8" ry="6" fill="#333"/>
+  <ellipse cx="50" cy="56" rx="3" ry="2" fill="#666"/>
+  <!-- 口 -->
+  <path d="M50,64 Q50,72 42,68" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M50,64 Q50,72 58,68" stroke="#333" stroke-width="2" fill="none"/>
+  <!-- 舌 -->
+  <ellipse cx="50" cy="72" rx="6" ry="8" fill="#ff6b6b"/>
+</svg>

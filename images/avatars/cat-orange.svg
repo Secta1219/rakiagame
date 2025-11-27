@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- 背景 -->
+  <circle cx="50" cy="50" r="48" fill="#ff6b35"/>
+  <!-- 耳 -->
+  <polygon points="20,35 30,10 40,35" fill="#fff"/>
+  <polygon points="60,35 70,10 80,35" fill="#fff"/>
+  <polygon points="23,32 30,15 37,32" fill="#ffb5a0"/>
+  <polygon points="63,32 70,15 77,32" fill="#ffb5a0"/>
+  <!-- 顔 -->
+  <ellipse cx="50" cy="55" rx="30" ry="28" fill="#fff"/>
+  <!-- 目 -->
+  <ellipse cx="38" cy="50" rx="6" ry="8" fill="#333"/>
+  <ellipse cx="62" cy="50" rx="6" ry="8" fill="#333"/>
+  <circle cx="40" cy="48" r="2" fill="#fff"/>
+  <circle cx="64" cy="48" r="2" fill="#fff"/>
+  <!-- 鼻 -->
+  <ellipse cx="50" cy="60" rx="4" ry="3" fill="#ffb5a0"/>
+  <!-- 口 -->
+  <path d="M50,63 Q45,70 40,65" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M50,63 Q55,70 60,65" stroke="#333" stroke-width="2" fill="none"/>
+  <!-- ひげ -->
+  <line x1="18" y1="55" x2="32" y2="58" stroke="#333" stroke-width="1.5"/>
+  <line x1="18" y1="62" x2="32" y2="62" stroke="#333" stroke-width="1.5"/>
+  <line x1="68" y1="58" x2="82" y2="55" stroke="#333" stroke-width="1.5"/>
+  <line x1="68" y1="62" x2="82" y2="62" stroke="#333" stroke-width="1.5"/>
+</svg>
