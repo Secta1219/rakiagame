@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rakia Games</title>
+    <link rel="icon" href="./images/favicon.png" type="image/png">
     <style>
         * {
             margin: 0;
@@ -51,26 +52,14 @@
         }
 
         .logo {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
-            white-space: nowrap;
         }
 
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.9rem;
+        .logo-img {
+            height: 32px;
+            width: auto;
         }
 
         nav {
@@ -568,14 +557,8 @@
                 gap: 8px;
             }
 
-            .logo {
-                font-size: 1rem;
-            }
-
-            .logo-icon {
-                width: 24px;
-                height: 24px;
-                font-size: 0.8rem;
+            .logo-img {
+                height: 26px;
             }
 
             nav {
@@ -607,8 +590,7 @@
     <header>
         <div class="header-content">
             <a href="./" class="logo">
-                <span class="logo-icon">R</span>
-                Rakia Games
+                <img src="./images/logo.png" alt="Rakia Games" class="logo-img">
             </a>
             <nav>
                 <a href="./" class="active">ゲーム</a>

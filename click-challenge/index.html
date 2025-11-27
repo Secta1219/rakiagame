@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>10秒クリックチャレンジ | Rakia Games</title>
+    <link rel="icon" href="../images/favicon.png" type="image/png">
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9155865843934014"
@@ -58,25 +59,20 @@
         }
 
         .logo {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
+            
+            
+            
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            
         }
 
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            border-radius: 6px;
+        .logo-img {
+            height: 32px;
+            width: auto;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.9rem;
         }
 
         .back-link {
@@ -90,13 +86,12 @@
         }
 
         .back-link:hover {
-            color: #fff;
+            
         }
 
         /* 広告付きレイアウト */
         .page-wrapper {
             display: flex;
-            justify-content: center;
             align-items: flex-start;
             gap: 20px;
             padding: 40px 20px;
@@ -143,7 +138,7 @@
         h1 {
             font-size: 1.6rem;
             margin-bottom: 8px;
-            color: #fff;
+            
             font-weight: 600;
         }
 
@@ -208,7 +203,6 @@
             cursor: pointer;
             margin: 30px auto;
             display: flex;
-            justify-content: center;
             align-items: center;
             transition: all 0.1s;
             user-select: none;
@@ -221,8 +215,7 @@
 
         .click-button:active {
             transform: scale(0.95);
-            background: var(--accent);
-            color: #fff;
+            
         }
 
         .click-button:disabled {
@@ -242,13 +235,11 @@
         }
 
         .control-button {
-            background: var(--accent);
-            color: #fff;
+            
             border: none;
             padding: 14px 40px;
             font-size: 1rem;
             font-weight: 600;
-            border-radius: 6px;
             cursor: pointer;
             margin: 8px;
             transition: all 0.15s;
@@ -327,7 +318,7 @@
         .new-record {
             display: none;
             color: var(--warning);
-            font-size: 1.2rem;
+            
             font-weight: bold;
             margin: 15px 0;
             animation: newRecordPulse 1s ease-in-out infinite;
@@ -376,7 +367,7 @@
 
         .ranking-title {
             font-size: 1rem;
-            color: #fff;
+            
             margin-bottom: 16px;
             font-weight: 600;
         }
@@ -391,7 +382,6 @@
             padding: 10px 12px;
             margin: 4px 0;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
         }
 
         .ranking-item:nth-child(1) {
@@ -422,8 +412,7 @@
             flex: 1;
             text-align: left;
             margin-left: 10px;
-            font-size: 0.9rem;
-            white-space: nowrap;
+            
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -449,7 +438,6 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.85);
             display: flex;
-            justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
@@ -473,8 +461,8 @@
 
         .modal h2 {
             margin-bottom: 20px;
-            color: #fff;
-            font-size: 1.2rem;
+            
+            
             font-weight: 600;
         }
 
@@ -494,9 +482,8 @@
             padding: 14px;
             font-size: 1rem;
             border: 1px solid var(--border);
-            border-radius: 6px;
             background: var(--bg-dark);
-            color: #fff;
+            
             margin-bottom: 20px;
             text-align: center;
         }
@@ -513,21 +500,18 @@
         .modal-buttons {
             display: flex;
             gap: 10px;
-            justify-content: center;
         }
 
         .modal-buttons button {
             padding: 12px 24px;
             font-size: 0.95rem;
             border: none;
-            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.15s;
         }
 
         .btn-submit {
-            background: var(--accent);
             color: white;
         }
 
@@ -542,7 +526,7 @@
         }
 
         .btn-cancel:hover {
-            color: #fff;
+            
         }
 
         .register-status {
@@ -580,8 +564,7 @@
     <header>
         <div class="header-content">
             <a href="../" class="logo">
-                <span class="logo-icon">R</span>
-                Rakia Games
+                <img src="../images/logo.png" alt="Rakia Games" class="logo-img">
             </a>
             <a href="../" class="back-link">← ゲーム一覧に戻る</a>
         </div>

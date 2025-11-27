@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プロフィール | Rakia Games</title>
+    <link rel="icon" href="../images/favicon.png" type="image/png">
     <style>
         * {
             margin: 0;
@@ -52,32 +53,27 @@
         }
 
         .logo {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
+            
+            
+            
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
-            white-space: nowrap;
+            
+            
         }
 
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            border-radius: 6px;
+        .logo-img {
+            height: 32px;
+            width: auto;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.9rem;
         }
 
         nav {
             display: flex;
-            gap: 8px;
-            white-space: nowrap;
+            
+            
         }
 
         nav a {
@@ -90,7 +86,7 @@
         }
 
         nav a:hover, nav a.active {
-            color: #fff;
+            
             background: var(--bg-card);
         }
 
@@ -105,7 +101,7 @@
 
         .page-title {
             font-size: 1.6rem;
-            color: #fff;
+            
             margin-bottom: 30px;
         }
 
@@ -153,7 +149,7 @@
 
         .profile-info h2 {
             font-size: 1.4rem;
-            color: #fff;
+            
             margin-bottom: 4px;
         }
 
@@ -169,7 +165,7 @@
 
         .section-title {
             font-size: 1rem;
-            color: #fff;
+            
             margin-bottom: 16px;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--border);
@@ -185,7 +181,6 @@
             flex: 1;
             padding: 12px 16px;
             border: 1px solid var(--border);
-            border-radius: 6px;
             background: var(--bg-dark);
             color: var(--text);
             font-size: 0.95rem;
@@ -198,11 +193,8 @@
 
         .save-btn {
             padding: 12px 24px;
-            background: var(--accent);
             border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 0.9rem;
+            
             cursor: pointer;
             transition: background 0.15s;
         }
@@ -293,12 +285,11 @@
 
         .stat-score {
             font-size: 1.8rem;
-            color: #fff;
-            font-weight: 700;
+            
+            
         }
 
         .stat-rank {
-            font-size: 0.9rem;
             color: var(--accent);
             margin-top: 4px;
         }
@@ -309,7 +300,6 @@
 
         .no-stats {
             color: var(--text-dim);
-            font-size: 0.9rem;
             text-align: center;
             padding: 20px;
         }
@@ -354,13 +344,13 @@
             }
             .avatar-grid {
                 grid-template-columns: repeat(5, 1fr);
-                gap: 8px;
-            white-space: nowrap;
+                
+            
             }
             .footer-content {
                 flex-direction: column;
-                gap: 8px;
-            white-space: nowrap;
+                
+            
                 text-align: center;
             }
         }
@@ -368,10 +358,9 @@
         /* スマホ向け（2段レイアウト） */
         @media (max-width: 600px) {
             header { padding: 0 4vw; }
-            .header-content { flex-wrap: wrap; height: auto; padding: 10px 0; gap: 8px; }
-            .logo { font-size: 1rem; }
-            .logo-icon { width: 24px; height: 24px; font-size: 0.8rem; }
-            nav { order: 3; width: 100%; justify-content: center; gap: 2vw; padding-top: 8px; border-top: 1px solid var(--border); }
+            .header-content { flex-wrap: wrap; height: auto; padding: 10px 0;  }
+            
+            .logo-img { height: 26px; }
             nav a { padding: 6px 12px; font-size: 0.8rem; }
         }
     </style>
@@ -380,8 +369,7 @@
     <header>
         <div class="header-content">
             <a href="../" class="logo">
-                <span class="logo-icon">R</span>
-                Rakia Games
+                <img src="../images/logo.png" alt="Rakia Games" class="logo-img">
             </a>
             <nav>
                 <a href="../">ゲーム</a>
