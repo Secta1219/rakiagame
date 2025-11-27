@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rakia-games-v3';
+const CACHE_NAME = 'rakia-games-v4';
 
 // キャッシュするファイル
 const STATIC_ASSETS = [
