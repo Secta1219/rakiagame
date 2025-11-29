@@ -33,56 +33,6 @@
             flex-direction: column;
         }
 
-        /* ヘッダー */
-        header {
-            background: var(--bg-dark);
-            padding: 0 40px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            height: 90px;
-            gap: 50px;
-        }
-
-        .logo {
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo-img {
-            height: 90px;
-            width: auto;
-        }
-
-        nav {
-            display: flex;
-            gap: 8px;
-        }
-
-        nav a {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.85rem;
-            padding: 8px 16px;
-            border-radius: 4px;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-
-        nav a:hover, nav a.active {
-            color: #fff;
-            background: var(--bg-card);
-        }
-
         /* メイン */
         main {
             max-width: 800px;
@@ -316,16 +266,6 @@
         }
 
         @media (max-width: 768px) {
-            header {
-                padding: 0 16px;
-            }
-            .header-content {
-                gap: 16px;
-            }
-            nav a {
-                padding: 8px 10px;
-                font-size: 0.8rem;
-            }
             main {
                 padding: 24px 16px;
             }
@@ -337,47 +277,17 @@
             }
             .avatar-grid {
                 grid-template-columns: repeat(5, 1fr);
-                
-            
             }
             .footer-content {
                 flex-direction: column;
-                
-            
                 text-align: center;
             }
-        }
-
-        /* スマホ向け（2段レイアウト） */
-        @media (max-width: 600px) {
-            header { padding: 0 4vw; }
-            .header-content { flex-wrap: wrap; height: auto; padding: 10px 0; gap: 8px; }
-            .logo-img { height: 60px; }
-            nav {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                gap: 2vw;
-                padding-top: 8px;
-                border-top: 1px solid var(--border);
-            }
-            nav a { padding: 6px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="../" class="logo">
-                <img src="../images/logo.png" alt="Rakia Games" class="logo-img">
-            </a>
-            <nav>
-                <a href="../">ゲーム</a>
-                <a href="../ranking/">ランキング</a>
-                <a href="../about/">About</a>
-            </nav>
-        </div>
-    </header>
+    <header></header>
+    <script src="../js/header.js"></script>
 
     <main>
         <h1 class="page-title">プロフィール</h1>

@@ -39,56 +39,6 @@
             color: var(--text);
         }
 
-        /* ヘッダー */
-        header {
-            background: var(--bg-dark);
-            padding: 0 40px;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            height: 90px;
-            gap: 50px;
-        }
-
-        .logo {
-            
-            
-            
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            
-        }
-
-        .logo-img {
-            height: 90px;
-            width: auto;
-            display: flex;
-            align-items: center;
-        }
-
-        .back-link {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.15s;
-        }
-
-        .back-link:hover {
-            
-        }
-
         /* 広告付きレイアウト */
         .page-wrapper {
             display: flex;
@@ -545,15 +495,6 @@
         }
 
         @media (max-width: 600px) {
-            header {
-                padding: 0 16px;
-            }
-            .header-content {
-                gap: 16px;
-            }
-            .logo-img {
-                height: 60px;
-            }
             h1 {
                 font-size: 1.3rem;
             }
@@ -565,14 +506,8 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="../" class="logo">
-                <img src="../images/logo.png" alt="Rakia Games" class="logo-img">
-            </a>
-            <a href="../" class="back-link">← ゲーム一覧に戻る</a>
-        </div>
-    </header>
+    <header></header>
+    <script src="../js/header.js"></script>
 
     <div class="page-wrapper">
         <!-- 左サイド広告 -->
