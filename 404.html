@@ -6,14 +6,18 @@
     <title>Rakia Games</title>
     <script>
         // GitHub Pages SPA redirect
-        // すべてのパスをindex.htmlにリダイレクト
-        const path = window.location.pathname;
+        // ベースパスを検出
+        const basePath = '/rakiagame';
+        const fullPath = window.location.pathname;
+
+        // ベースパスを除いた相対パスを取得
+        let relativePath = fullPath.replace(basePath, '') || '/';
         const search = window.location.search;
         const hash = window.location.hash;
 
         // セッションストレージにパスを保存してリダイレクト
-        sessionStorage.setItem('redirectPath', path + search + hash);
-        window.location.replace('/');
+        sessionStorage.setItem('redirectPath', relativePath + search + hash);
+        window.location.replace(basePath + '/');
     </script>
 </head>
 <body>

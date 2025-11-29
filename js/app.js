@@ -2,6 +2,9 @@
 // Rakia Games - SPA Main Application
 // ========================================
 
+// ベースパス設定（GitHub Pages用）
+const BASE_PATH = '/rakiagame';
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
@@ -71,15 +74,17 @@ const Router = {
     },
 
     navigate(path, pushState = true) {
+        // 内部パスにBASE_PATHを追加
+        const fullPath = path.startsWith('/') ? BASE_PATH + path : path;
         if (pushState) {
-            history.pushState({ path }, '', path);
+            history.pushState({ path }, '', fullPath);
         }
         this.handleRoute(path);
     },
 
     handleRoute(path) {
-        // パスを正規化
-        let normalizedPath = path.replace(/\/$/, '') || '/';
+        // BASE_PATHを除去してから正規化
+        let normalizedPath = path.replace(BASE_PATH, '').replace(/\/$/, '') || '/';
 
         // ルートマッチング
         let handler = this.routes[normalizedPath];
@@ -407,10 +412,10 @@ const Components = {
             if (isGamePage) {
                 return `
                     <div class="header-content">
-                        <a href="/" class="logo">
-                            <img src="./images/logo.png" alt="Rakia Games" class="logo-img">
+                        <a href="${BASE_PATH}/" class="logo">
+                            <img src="${BASE_PATH}/images/logo.png" alt="Rakia Games" class="logo-img">
                         </a>
-                        <a href="/" class="back-link">← ゲーム一覧に戻る</a>
+                        <a href="${BASE_PATH}/" class="back-link">← ゲーム一覧に戻る</a>
                     </div>
                 `;
             }
@@ -419,13 +424,13 @@ const Components = {
 
             return `
                 <div class="header-content">
-                    <a href="/" class="logo">
-                        <img src="./images/logo.png" alt="Rakia Games" class="logo-img">
+                    <a href="${BASE_PATH}/" class="logo">
+                        <img src="${BASE_PATH}/images/logo.png" alt="Rakia Games" class="logo-img">
                     </a>
                     <nav>
-                        <a href="/" class="${currentPath === '/' ? 'active' : ''}">ゲーム</a>
-                        <a href="/ranking" class="${currentPath === '/ranking' ? 'active' : ''}">ランキング</a>
-                        <a href="/about" class="${currentPath === '/about' ? 'active' : ''}">About</a>
+                        <a href="${BASE_PATH}/" class="${currentPath === '/' ? 'active' : ''}">ゲーム</a>
+                        <a href="${BASE_PATH}/ranking" class="${currentPath === '/ranking' ? 'active' : ''}">ランキング</a>
+                        <a href="${BASE_PATH}/about" class="${currentPath === '/about' ? 'active' : ''}">About</a>
                     </nav>
                     <div class="auth-area" id="authArea">
                         <button class="login-btn" id="loginBtn">ログイン</button>
@@ -447,11 +452,11 @@ const Components = {
                 authArea.innerHTML = `
                     <div class="user-dropdown">
                         <button class="user-dropdown-btn" id="userDropdownBtn">
-                            <img src="./images/avatars/${avatarId}.svg" class="user-avatar">
+                            <img src="${BASE_PATH}/images/avatars/${avatarId}.svg" class="user-avatar">
                             <span class="user-name">${Utils.escapeHtml(name)}</span>
                         </button>
                         <div class="user-dropdown-menu" id="userDropdownMenu">
-                            <a href="/profile">プロフィール</a>
+                            <a href="${BASE_PATH}/profile">プロフィール</a>
                             <div class="divider"></div>
                             <button id="logoutBtn">ログアウト</button>
                         </div>
@@ -735,7 +740,7 @@ const Pages = {
         let games = App.state.games;
         if (games.length === 0) {
             try {
-                const response = await fetch('./data/games.json');
+                const response = await fetch(`${BASE_PATH}/data/games.json`);
                 games = await response.json();
                 App.setState({ games });
             } catch (error) {
@@ -756,7 +761,7 @@ const Pages = {
                         <div class="game-card${game.comingSoon ? ' coming-soon' : ''}" data-game="${game.id}">
                             <div class="game-thumbnail">
                                 ${game.image
-                                    ? `<img src="./images/${game.image}" alt="${Utils.escapeHtml(game.title)}">`
+                                    ? `<img src="${BASE_PATH}/images/${game.image}" alt="${Utils.escapeHtml(game.title)}">`
                                     : '<span class="placeholder">?</span>'
                                 }
                             </div>
@@ -799,12 +804,12 @@ const Pages = {
 
                 <div class="game-ranking">
                     <div class="game-ranking-header">
-                        <img src="./images/click-challenge.png" alt="10秒クリックチャレンジ" class="game-icon">
+                        <img src="${BASE_PATH}/images/click-challenge.png" alt="10秒クリックチャレンジ" class="game-icon">
                         <div class="game-info">
                             <h2>10秒クリックチャレンジ</h2>
                             <p>10秒間で何回クリックできる？</p>
                         </div>
-                        <a href="/games/click-challenge" class="play-link">プレイする</a>
+                        <a href="${BASE_PATH}/games/click-challenge" class="play-link">プレイする</a>
                     </div>
                     <ul class="ranking-list" id="clickChallengeRanking">
                         <li class="ranking-loading">読み込み中...</li>
@@ -895,7 +900,7 @@ const Pages = {
                     <div class="profile-card">
                         <div class="profile-header">
                             <div class="current-avatar">
-                                <img src="./images/avatars/${currentAvatarId}.svg" alt="アバター" id="avatarImg">
+                                <img src="${BASE_PATH}/images/avatars/${currentAvatarId}.svg" alt="アバター" id="avatarImg">
                             </div>
                             <div class="profile-info">
                                 <h2 id="displayName">${Utils.escapeHtml(userProfile?.displayName || 'ユーザー')}</h2>
@@ -924,7 +929,7 @@ const Pages = {
                             <div class="avatar-grid" id="avatarGrid">
                                 ${allAvatars.map(id => `
                                     <div class="avatar-option${id === currentAvatarId ? ' selected' : ''}" data-avatar="${id}">
-                                        <img src="./images/avatars/${id}.svg" alt="${id}">
+                                        <img src="${BASE_PATH}/images/avatars/${id}.svg" alt="${id}">
                                     </div>
                                 `).join('')}
                             </div>
@@ -975,7 +980,7 @@ const Pages = {
 
                     Utils.$$('.avatar-option').forEach(el => el.classList.remove('selected'));
                     option.classList.add('selected');
-                    Utils.$('#avatarImg').src = `./images/avatars/${avatarId}.svg`;
+                    Utils.$('#avatarImg').src = `${BASE_PATH}/images/avatars/${avatarId}.svg`;
 
                     await Auth.saveUserProfile(user.uid, { avatarId });
                     App.setState({ userProfile: { ...userProfile, avatarId } });
@@ -1026,7 +1031,7 @@ const Pages = {
     async Game(gameId) {
         // ゲームモジュールを動的読み込み
         try {
-            const module = await import(`./pages/games/${gameId}.js`);
+            const module = await import(`${BASE_PATH}/js/pages/games/${gameId}.js`);
             module.default({ App, Auth, Ranking, Utils, Components, Modals, Router });
         } catch (error) {
             console.error('ゲーム読み込みエラー:', error);
@@ -1070,7 +1075,7 @@ function init() {
 
     // Service Worker登録
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register(`${BASE_PATH}/sw.js`)
             .then(() => console.log('Service Worker registered'))
             .catch((err) => console.log('Service Worker registration failed:', err));
     }
