@@ -1,0 +1,18 @@
+[
+    {
+        "id": "click-challenge",
+        "title": "10秒クリックチャレンジ",
+        "description": "10秒間で何回クリックできる？限界に挑戦しよう",
+        "image": "click-challenge.png",
+        "tags": ["クリッカー", "スコアアタック"],
+        "comingSoon": false
+    },
+    {
+        "id": "coming-soon",
+        "title": "Coming Soon",
+        "description": "新しいゲームを準備中です",
+        "image": null,
+        "tags": ["準備中"],
+        "comingSoon": true
+    }
+]

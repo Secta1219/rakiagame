@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rakia Games</title>
+    <script>
+        // GitHub Pages SPA redirect
+        // すべてのパスをindex.htmlにリダイレクト
+        const path = window.location.pathname;
+        const search = window.location.search;
+        const hash = window.location.hash;
+
+        // セッションストレージにパスを保存してリダイレクト
+        sessionStorage.setItem('redirectPath', path + search + hash);
+        window.location.replace('/');
+    </script>
+</head>
+<body>
+    <p>リダイレクト中...</p>
+</body>
+</html>
